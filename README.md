@@ -1,6 +1,6 @@
 # .claude
 
-My personal [Claude Code](https://claude.ai/claude-code) configuration. This repo contains the custom rules, agents, skills, and status line scripts I use daily.
+My personal [Claude Code](https://code.claude.com/docs/en/overview) configuration. This repo contains the custom rules, agents, skills, and status line scripts I use daily.
 
 ## What's Here
 
