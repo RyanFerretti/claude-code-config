@@ -1,0 +1,16 @@
+# Ignore everything
+*
+
+# Whitelist config and customizations
+!.gitignore
+!README.md
+!CLAUDE.md
+!settings.json
+!agents/
+!agents/**
+!rules/
+!rules/**
+!skills/
+!skills/**
+!status_lines/
+!status_lines/**
