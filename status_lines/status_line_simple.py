@@ -160,11 +160,11 @@ def format_tmux_status():
 def generate_status_line(input_data):
     """Generate a simple status line that doesn't require session files."""
     # Get model name
-    model_info = input_data.get("model", {})
+    model_info = input_data.get("model") or {}
     model_name = model_info.get("display_name", "Claude")
-    
+
     # Get cost info
-    cost_info = input_data.get("cost", {})
+    cost_info = input_data.get("cost") or {}
     total_cost = cost_info.get("total_cost_usd", 0)
     
     # Get git branch
@@ -195,11 +195,11 @@ def generate_status_line(input_data):
     parts.append(f"\033[34m{model_name}\033[0m")
 
     # Context usage - progress bar with color thresholds
-    context_info = input_data.get("context_window", {})
+    context_info = input_data.get("context_window") or {}
     if context_info:
         used_pct = context_info.get("used_percentage")
         if used_pct is None:
-            usage = context_info.get("current_usage", {})
+            usage = context_info.get("current_usage") or {}
             window_size = context_info.get("context_window_size", 200000)
             tokens_used = (
                 usage.get("input_tokens", 0) +
@@ -258,7 +258,7 @@ def main():
         
     except Exception as e:
         # Handle errors gracefully
-        print(f"\033[31m[1099-job-board] Error: {str(e)}\033[0m")
+        print(f"\033[31mStatus line error: {str(e)}\033[0m")
         sys.exit(0)
 
 
