@@ -1,6 +1,6 @@
 - NEVER RESET MY LOCAL DATABASE, IF YOU THINK WE NEED TO DO IT THEN TELL ME TO DO IT
-- don't ever run a destructive command without asking me first
-- do not run any AWS cli commands, tell me and I will run them
+- Don't ever run a destructive command without asking me first
+- Do not run any AWS, GCP, or Azure CLI commands. Tell me and I will run them, or I will give you permission to run them one by one.
 
 ## Development Server Management
 
@@ -36,3 +36,17 @@
 
 **See full details:** `~/.claude/rules/tmux-dev-server.md`
 - with openai, always use the newest models which are now gpt-5.1 , gpt-5-mini , gpt-5-nano ... stop using GPT-4o and the variants
+
+## Temporary Files
+- Always use a `./tmp` directory at the project root for temporary, debug, or scratch files that have no long-term value and should not be committed.
+- Never leave temp/debug files scattered in the project directory.
+
+## New Project Setup
+- Ensure a `.gitignore` exists at the project root, seeded at minimum with:
+  ```
+  .DS_Store
+  tmp/
+  node_modules/
+  .env*
+  *.log
+  ```
