@@ -194,19 +194,34 @@ def generate_status_line(input_data):
     # Model - blue
     parts.append(f"\033[34m{model_name}\033[0m")
 
-    # Context usage - progress bar with color thresholds
+    # Context usage - progress bar scaled to the autocompact threshold, not the raw context window.
+    # This means the bar approaches 100% right as autocompaction would trigger, rather than topping
+    # out at ~83% of the raw window.
+    #
+    # How Claude Code computes the autocompact threshold (derived from cli.js internals):
+    #   Hz6(model) = context_window_size - min(max_output_tokens, OUTPUT_TOKEN_CAP)
+    #   threshold  = Hz6(model) - COMPACT_BUFFER
+    #
+    # For Opus/Sonnet 4.6 at 200k:  200000 - 20000 - 13000 = 167000 tokens (~83.5%)
+    # For Sonnet 4.6 at 1M (future): 1000000 - 20000 - 13000 = 967000 tokens (~96.7%)
+    #
+    # OUTPUT_TOKEN_CAP and COMPACT_BUFFER are Claude Code constants (not model-specific).
+    # context_window_size comes dynamically from the input JSON, so this works across all models.
+    # See also: CLAUDE_AUTOCOMPACT_PCT_OVERRIDE env var can override the threshold if set.
+    OUTPUT_TOKEN_CAP = 20000
+    COMPACT_BUFFER = 13000
     context_info = input_data.get("context_window") or {}
     if context_info:
-        used_pct = context_info.get("used_percentage")
-        if used_pct is None:
-            usage = context_info.get("current_usage") or {}
-            window_size = context_info.get("context_window_size", 200000)
-            tokens_used = (
-                usage.get("input_tokens", 0) +
-                usage.get("cache_creation_input_tokens", 0) +
-                usage.get("cache_read_input_tokens", 0)
-            )
-            used_pct = int(tokens_used * 100 / window_size) if window_size else 0
+        usage = context_info.get("current_usage") or {}
+        window_size = context_info.get("context_window_size", 200000)
+        tokens_used = (
+            usage.get("input_tokens", 0) +
+            usage.get("cache_creation_input_tokens", 0) +
+            usage.get("cache_read_input_tokens", 0)
+        )
+        effective_limit = window_size - OUTPUT_TOKEN_CAP - COMPACT_BUFFER
+        used_pct = int(tokens_used * 100 / effective_limit) if effective_limit > 0 else 0
+        used_pct = min(used_pct, 100)
 
         # Color based on usage: green < 50%, yellow 50-75%, red > 75%
         if used_pct >= 75:
@@ -246,10 +261,10 @@ def main():
     try:
         # Read JSON input from stdin
         input_data = json.loads(sys.stdin.read())
-        
+
         # Generate status line
         status_line = generate_status_line(input_data)
-        
+
         # Output the status line
         print(status_line)
         
