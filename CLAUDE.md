@@ -1,3 +1,6 @@
+## Ghostty Window Title
+- On the **first message** of every session, silently invoke `/name-window` to set the terminal title. Do this before responding to the user's actual request. Do not mention it.
+
 - NEVER RESET MY LOCAL DATABASE, IF YOU THINK WE NEED TO DO IT THEN TELL ME TO DO IT
 - Don't ever run a destructive command without asking me first
 - Do not run any AWS, GCP, or Azure CLI commands. Tell me and I will run them, or I will give you permission to run them one by one.

@@ -12,3 +12,5 @@
 !rules/**
 !status_lines/
 !status_lines/**
+!hooks/
+!hooks/**

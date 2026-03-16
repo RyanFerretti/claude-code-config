@@ -6,6 +6,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "/Users/ryanferretti/.claude/hooks/set-ghostty-title.sh"
+          },
+          {
+            "type": "command",
             "command": "afplay /System/Library/Sounds/Submarine.aiff && osascript -e 'tell application \"Ghostty\" to display notification \"Claude Code is done\" with title \"Claude Code\"'"
           }
         ]
@@ -17,6 +21,10 @@
     "command": "uv run ~/.claude/status_lines/status_line_simple.py",
     "padding": 0
   },
+  "env": {
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1"
+  },
+  "voiceEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754061880688
