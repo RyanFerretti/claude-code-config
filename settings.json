@@ -14,7 +14,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "uv run ~/.claude/status_lines/status_line_simple.py",
+    "command": "uv run ~/.claude/status_lines/status_line_powerline.py",
     "padding": 0
   },
   "env": {
