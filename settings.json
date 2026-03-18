@@ -6,10 +6,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/ryanferretti/.claude/hooks/set-ghostty-title.sh"
-          },
-          {
-            "type": "command",
             "command": "afplay /System/Library/Sounds/Submarine.aiff && osascript -e 'tell application \"Ghostty\" to display notification \"Claude Code is done\" with title \"Claude Code\"'"
           }
         ]
