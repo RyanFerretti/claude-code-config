@@ -47,7 +47,10 @@ def powerline_segments(segments):
         else:
             prev_bg = segments[i - 1][0]
             result.append(f"{fg(prev_bg)}{bg(bg_col)}{PL_RIGHT}")
-        result.append(f"{bg(bg_col)}{fg(fg_col)} {text} ")
+        if text:
+            result.append(f"{bg(bg_col)}{fg(fg_col)} {text} ")
+        else:
+            result.append(f"{bg(bg_col)}")
 
     # Final arrow: last segment bg -> default background
     if segments:
@@ -238,22 +241,26 @@ def generate_status_line(input_data):
 
         segments.append((ctx_bg, 255, f"{' ' * left_pad}{label}{' ' * right_pad}"))
 
-    # --- Cost ---
+    # --- Cost + Duration ---
     cost_info = input_data.get("cost") or {}
     total_cost = cost_info.get("total_cost_usd", 0)
-    if total_cost > 0:
-        segments.append((110, 255, f"${total_cost:.2f}"))  # light blue bg (#86BBD8)
-
-    # --- Duration + Time ---
-    ct = datetime.now(ZoneInfo("America/Chicago"))
-    now = ct.strftime('%-I:%M%p').lower()
     duration_ms = cost_info.get("total_duration_ms", 0)
+    cost_parts = []
     if duration_ms > 0:
         total_mins = int(duration_ms / 60000)
         hours, mins = divmod(total_mins, 60)
-        segments.append((30, 255, f"{hours}:{mins:02d} \uf017  {now}"))  # teal bg (#06969A)
+        cost_parts.append(f"{hours}:{mins:02d}")
+    if total_cost > 0:
+        cost_parts.append(f" ${total_cost:.2f}")
+    if cost_parts:
+        segments.append((110, 255, f" \uefca ".join(cost_parts)))  # light blue bg (#86BBD8)
     else:
-        segments.append((30, 255, now))  # teal bg (#06969A)
+        segments.append((110, None, ""))  # empty sliver
+
+    # --- Time ---
+    ct = datetime.now(ZoneInfo("America/Chicago"))
+    now = f"\uf017  {ct.strftime('%-m/%-d')} {ct.strftime('%-I:%M%p').lower()}"
+    segments.append((30, 255, now))  # teal bg (#06969A)
 
     # --- Server/tmux status ---
     server_text, is_up = get_server_status()
@@ -263,7 +270,7 @@ def generate_status_line(input_data):
         else:
             segments.append((31, 255, server_text))  # dark blue bg (#33658A)
     else:
-        segments.append((31, 255, "\u25cb offline"))  # dark blue bg (#33658A)
+        segments.append((31, None, ""))  # empty sliver
 
     return powerline_segments(segments)
 
