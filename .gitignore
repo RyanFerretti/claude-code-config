@@ -6,6 +6,10 @@
 !README.md
 !CLAUDE.md
 !settings.json
+!bootstrap.sh
+!agents-skill-lock.json
+!agents-skills/
+!agents-skills/**
 !agents/
 !agents/**
 !rules/
@@ -14,3 +18,17 @@
 !status_lines/**
 !hooks/
 !hooks/**
+
+# skills/ is whitelisted PER-SKILL, never wholesale — this repo is PUBLIC and
+# some local skills document client systems and must not be published. Add a new
+# line here only after confirming the skill is generic. Symlinked skills are not
+# tracked either; bootstrap.sh recreates them from agents-skill-lock.json so a
+# fresh clone never lands with dangling links.
+!skills/
+!skills/code-reviewer/**
+!skills/frontend-design/**
+!skills/prd-reviewer/**
+
+# Never:
+#   projects/**   — transcripts AND per-project memory (client-internal)
+#   *.bak*        — settings backups

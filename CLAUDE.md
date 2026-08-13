@@ -5,6 +5,12 @@
 - Don't ever run a destructive command without asking me first
 - Do not run any AWS, GCP, or Azure CLI commands. Tell me and I will run them, or I will give you permission to run them one by one.
 
+## No Time/Effort Estimates
+- **Never give estimates in days, weeks, hours, or sprints** for implementation work. Don't say "~3–5 days", "1 week", "2-week phase", etc.
+- Reason: I build with AI agents — human-calendar estimates are radically off and meaningless.
+- Instead: describe scope (number of tests, surfaces covered, dependencies), order (phase 1 → 2 → 3, what unblocks what), and complexity tier (low/medium/high) without attaching a duration.
+- Applies to plans, phased rollouts, project breakdowns, ticket sizing — everywhere. If asked directly for a duration, decline and offer scope/complexity instead.
+
 ## Development Server Management
 
 **ALWAYS use tmux for long-running development processes** (dev servers, test watchers, build processes, etc.)
@@ -38,7 +44,7 @@
    ```
 
 **See full details:** `~/.claude/rules/tmux-dev-server.md`
-- with openai, always use the newest models which are now gpt-5.1 , gpt-5-mini , gpt-5-nano ... stop using GPT-4o and the variants
+- with openai, always use the newest models which are now gpt-5.5 , gpt-5-mini , gpt-5-nano ... stop using GPT-4o / gpt-5.1 and earlier variants. For Codex CLI specifically, prefer omitting `--model` and inheriting the default from `~/.codex/config.toml` (currently `gpt-5.5`) — that way this stays correct when the default moves again.
 
 ## Temporary Files
 - Always use a `./tmp` directory at the project root for temporary, debug, or scratch files that have no long-term value and should not be committed.
@@ -53,3 +59,4 @@
   .env*
   *.log
   ```
+Use bun/bunx over npm/npx

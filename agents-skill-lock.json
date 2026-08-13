@@ -1,0 +1,82 @@
+{
+  "version": 3,
+  "skills": {
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "c2f31172b6f256272305a5e6e7228b258446899f",
+      "installedAt": "2026-02-10T19:50:36.214Z",
+      "updatedAt": "2026-02-10T19:50:36.214Z"
+    },
+    "vercel-observability": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/bobmatnyc/claude-mpm-skills.git",
+      "skillPath": "toolchains/platforms/deployment/vercel-observability/SKILL.md",
+      "skillFolderHash": "ed21333aa8486efaa75f755ba593448e459ba49a",
+      "installedAt": "2026-02-10T19:58:24.981Z",
+      "updatedAt": "2026-02-10T19:58:24.981Z"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/supabase/agent-skills.git",
+      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
+      "skillFolderHash": "95fe6d29daaf88aa9bc3b505ca4defe19ceabf92",
+      "installedAt": "2026-02-12T23:09:30.804Z",
+      "updatedAt": "2026-03-13T15:26:37.276Z"
+    },
+    "mermaid-diagrams": {
+      "source": "softaworks/agent-toolkit",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/softaworks/agent-toolkit.git",
+      "skillPath": "skills/mermaid-diagrams/SKILL.md",
+      "skillFolderHash": "1b7a962715838d762fe4b34701d797d1d57496cd",
+      "installedAt": "2026-02-15T21:00:29.216Z",
+      "updatedAt": "2026-02-15T21:00:29.216Z"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "skillFolderHash": "18a9a6d17d5958d4ab10405883b80960644dbd5b",
+      "installedAt": "2026-02-17T22:36:25.374Z",
+      "updatedAt": "2026-03-13T15:26:39.249Z"
+    },
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/agent-browser.git",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "skillFolderHash": "e81e77232443f0b2d70f152a671c6581850db856",
+      "installedAt": "2026-02-18T00:01:53.892Z",
+      "updatedAt": "2026-03-13T15:26:41.403Z"
+    },
+    "testing": {
+      "source": "andrelandgraf/fullstackrecipes",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/andrelandgraf/fullstackrecipes.git",
+      "skillPath": "skills/testing/SKILL.md",
+      "skillFolderHash": "a8884d2818093124de29a9d79e71b86c6c0e7373",
+      "installedAt": "2026-04-04T19:04:39.039Z",
+      "updatedAt": "2026-04-04T19:04:39.039Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "cline",
+    "codex",
+    "cursor",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-cli",
+    "opencode",
+    "claude-code"
+  ]
+}

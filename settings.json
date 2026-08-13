@@ -1,5 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "cleanupPeriodDays": 9999,
+  "env": {
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1"
+  },
+  "model": "opus[1m]",
   "hooks": {
     "Stop": [
       {
@@ -7,6 +12,84 @@
           {
             "type": "command",
             "command": "afplay /System/Library/Sounds/Submarine.aiff && osascript -e 'tell application \"Ghostty\" to display notification \"Claude Code is done\" with title \"Claude Code\"'"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook Stop >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook PreCompact >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook PreToolUse >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook PostToolUse >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook UserPromptSubmit >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook SessionStart >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook PermissionRequest >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/ryanferretti/Projects/personal/ccdash/dist/ccdash hook SessionEnd >/dev/null 2>&1 || true #ccdash-owned:/Projects/personal/ccdash/"
           }
         ]
       }
@@ -17,11 +100,22 @@
     "command": "uv run ~/.claude/status_lines/status_line_powerline.py",
     "padding": 0
   },
-  "env": {
-    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1"
+  "enabledPlugins": {
+    "qmd@qmd": true
   },
-  "voiceEnabled": false,
+  "extraKnownMarketplaces": {
+    "qmd": {
+      "source": {
+        "source": "github",
+        "repo": "tobi/qmd"
+      }
+    }
+  },
+  "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": false,
   "feedbackSurveyState": {
     "lastShownTime": 1754061880688
   }
