@@ -97,7 +97,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "uv run ~/.claude/status_lines/status_line_powerline.py",
+    "command": "~/.claude/status_lines/run.sh",
     "padding": 0
   },
   "enabledPlugins": {
