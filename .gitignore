@@ -10,6 +10,8 @@
 !agents-skill-lock.json
 !agents-skills/
 !agents-skills/**
+!terminal/
+!terminal/**
 !agents/
 !agents/**
 !rules/

@@ -9,6 +9,7 @@ My personal [Claude Code](https://code.claude.com/docs/en/overview) configuratio
 - **bootstrap.sh** - One-shot setup for a new macOS machine (see below)
 - **agents/** - Custom sub-agent definitions (e.g., meta-agent for generating new agents)
 - **rules/** - Reusable rules for common workflows (e.g., tmux dev server management)
+- **terminal/** - Ghostty and starship configs, installed to `~/.config`
 - **agents-skills/** - Hand-written skills with no upstream, installed to `~/.agents/skills`
 - **agents-skill-lock.json** - Pinned upstream sources for the rest of `~/.agents/skills`
 - **skills/** - A few self-contained skills; the rest are symlinks into `~/.agents/skills`
@@ -61,5 +62,22 @@ Flags:
 
 Run `--verify` first on an existing machine to see what's missing.
 
-The status line requires [uv](https://github.com/astral-sh/uv) and a Nerd Font in
-your terminal — without either it renders as blanks or tofu.
+The status line requires [uv](https://github.com/astral-sh/uv) and a font with
+Nerd Font glyphs. Ghostty's default font already includes them, so `terminal/`
+deliberately does not set `font-family` — override it only with a Nerd Font
+variant, or the status line and starship prompt turn to tofu.
+
+### Ghostty on macOS
+
+Ghostty merges **both** of these:
+
+```
+~/.config/ghostty/config                                   (XDG)
+~/Library/Application Support/com.mitchellh.ghostty/config (macOS)
+```
+
+Settings drift across the two — `/terminal-setup` writes its `shift+enter`
+binding to the macOS path while hand-edits tend to land in the XDG one, so a
+machine move silently loses half the setup. Everything is consolidated into
+`terminal/ghostty.config`; bootstrap installs it to the XDG path and warns if
+the macOS path still holds live settings.

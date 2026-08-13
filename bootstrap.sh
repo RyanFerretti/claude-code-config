@@ -60,7 +60,10 @@ fi
 # ── 1. prereqs ──────────────────────────────────────────────────────────────
 say "Prerequisites"
 BREW_PKGS=(git gh tmux ripgrep jq starship fnm uv)
-CASKS=(ghostty font-meslo-lg-nerd-font)
+# No Nerd Font cask: Ghostty's default font bundles JetBrains Mono with Nerd
+# Font symbol fallback, which is what renders the powerline status line and the
+# starship glyphs. Only install one if you override font-family.
+CASKS=(ghostty)
 
 if [ "$SKIP_BREW" = 1 ]; then
   warn "Skipping Homebrew (--skip-brew)"
@@ -209,6 +212,34 @@ PY
   warn "settings.json now differs from origin/master — don't commit it back from this machine"
 else
   ok "left as-is (use --managed to strip ccdash + permission-bypass)"
+fi
+
+# ── 6b. terminal (Ghostty + starship) ───────────────────────────────────────
+# Ghostty on macOS merges ~/.config/ghostty/config with the Application Support
+# copy. Consolidated into the XDG path so nothing is left behind on a move.
+say "Terminal"
+install_cfg() {  # src dest label
+  local src="$1" dest="$2" label="$3"
+  [ -f "$src" ] || { bad "$label — missing from repo"; return; }
+  if [ -f "$dest" ] && cmp -s "$src" "$dest"; then ok "$label (current)"; return; fi
+  if [ -f "$dest" ]; then
+    warn "$label differs — backing up to $(basename "$dest").pre-bootstrap"
+    run "cp '$dest' '$dest.pre-bootstrap'"
+  fi
+  run "mkdir -p '$(dirname "$dest")'"
+  run "cp '$src' '$dest'"
+  ok "$label installed"
+}
+install_cfg "$CLAUDE_DIR/terminal/ghostty.config" "$HOME/.config/ghostty/config"  "ghostty"
+install_cfg "$CLAUDE_DIR/terminal/starship.toml"  "$HOME/.config/starship.toml"   "starship"
+
+GH_APP_CFG="$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+if [ -f "$GH_APP_CFG" ] && grep -qvE '^\s*(#|$)' "$GH_APP_CFG" 2>/dev/null; then
+  if grep -qE '^\s*[a-z-]+\s*=' "$GH_APP_CFG" 2>/dev/null; then
+    warn "macOS-path Ghostty config has live settings — Ghostty merges it with"
+    warn "the XDG one. Fold anything you want to keep into terminal/ghostty.config:"
+    grep -E '^\s*[a-z-]+\s*=' "$GH_APP_CFG" | sed 's/^/      /'
+  fi
 fi
 
 # ── 7. plugins ──────────────────────────────────────────────────────────────
