@@ -233,6 +233,32 @@ install_cfg() {  # src dest label
 install_cfg "$CLAUDE_DIR/terminal/ghostty.config" "$HOME/.config/ghostty/config"  "ghostty"
 install_cfg "$CLAUDE_DIR/terminal/starship.toml"  "$HOME/.config/starship.toml"   "starship"
 
+# The shell needs init lines for starship/fnm/bun/uv or the configs above are
+# installed but inert — and a missing uv on PATH means no status line at all.
+FRAG="$CLAUDE_DIR/terminal/zshrc-fragment.sh"
+if [ -f "$FRAG" ] && [ "$VERIFY" != 1 ] && [ "$DRY" != 1 ]; then
+  python3 - "$FRAG" "$HOME/.zshrc" <<'PY'
+import sys, os, re
+frag_path, rc_path = sys.argv[1], sys.argv[2]
+frag = open(frag_path).read().rstrip() + "\n"
+rc = open(rc_path).read() if os.path.exists(rc_path) else ""
+block = re.compile(r"\n?# >>> claude-code-config >>>.*?# <<< claude-code-config <<<\n?", re.S)
+if block.search(rc):
+    new, action = block.sub("\n" + frag, rc), "updated"
+else:
+    new, action = (rc.rstrip() + "\n\n" + frag if rc.strip() else frag), "appended"
+if new != rc:
+    if rc: open(rc_path + ".pre-bootstrap", "w").write(rc)
+    open(rc_path, "w").write(new)
+    print(f"  \033[32m✓\033[0m ~/.zshrc block {action}")
+else:
+    print("  \033[32m✓\033[0m ~/.zshrc block (current)")
+PY
+  warn "run 'exec zsh' or open a new tab for the shell changes to take effect"
+elif [ -f "$FRAG" ]; then
+  ok "~/.zshrc block (skipped in verify/dry-run)"
+fi
+
 GH_APP_CFG="$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 if [ -f "$GH_APP_CFG" ] && grep -qvE '^\s*(#|$)' "$GH_APP_CFG" 2>/dev/null; then
   if grep -qE '^\s*[a-z-]+\s*=' "$GH_APP_CFG" 2>/dev/null; then

@@ -9,7 +9,7 @@ My personal [Claude Code](https://code.claude.com/docs/en/overview) configuratio
 - **bootstrap.sh** - One-shot setup for a new macOS machine (see below)
 - **agents/** - Custom sub-agent definitions (e.g., meta-agent for generating new agents)
 - **rules/** - Reusable rules for common workflows (e.g., tmux dev server management)
-- **terminal/** - Ghostty and starship configs, installed to `~/.config`
+- **terminal/** - Ghostty and starship configs plus the `~/.zshrc` block that makes them active
 - **agents-skills/** - Hand-written skills with no upstream, installed to `~/.agents/skills`
 - **agents-skill-lock.json** - Pinned upstream sources for the rest of `~/.agents/skills`
 - **skills/** - A few self-contained skills; the rest are symlinks into `~/.agents/skills`
@@ -66,6 +66,19 @@ The status line requires [uv](https://github.com/astral-sh/uv) and a font with
 Nerd Font glyphs. Ghostty's default font already includes them, so `terminal/`
 deliberately does not set `font-family` — override it only with a Nerd Font
 variant, or the status line and starship prompt turn to tofu.
+
+### Shell
+
+`terminal/zshrc-fragment.sh` is appended to `~/.zshrc` between marker comments —
+`starship init`, `fnm env`, the bun PATH, and `~/.local/bin`. Re-running bootstrap
+replaces the block in place rather than appending a second copy, and backs the
+old file up to `~/.zshrc.pre-bootstrap`.
+
+Without it the configs install but stay inert: `starship.toml` is present with no
+prompt, and — more visibly — `uv` may be off PATH, which makes the Claude Code
+status line render as **nothing at all** rather than erroring.
+
+Deliberately excluded: API keys, and the `--dangerously-skip-permissions` aliases.
 
 ### Ghostty on macOS
 
