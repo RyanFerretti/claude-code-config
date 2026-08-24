@@ -160,7 +160,7 @@ else
   bad "agents-skill-lock.json missing from config repo"
 fi
 
-# vendored, no upstream — name-window is required by global CLAUDE.md
+# vendored, no upstream — hand-written skills with nothing to pull from
 if [ -d "$CLAUDE_DIR/agents-skills" ]; then
   for d in "$CLAUDE_DIR"/agents-skills/*/; do
     n=$(basename "$d")
@@ -294,7 +294,13 @@ say "Verify"
 [ -f "$CLAUDE_DIR/rules/tmux-dev-server.md" ]         && ok "rules/"           || bad "rules/"
 [ -f "$CLAUDE_DIR/agents/meta-agent.md" ]             && ok "agents/"          || bad "agents/"
 [ -f "$CLAUDE_DIR/status_lines/status_line_powerline.py" ] && ok "status line" || bad "status line"
-[ -e "$CLAUDE_DIR/skills/name-window" ]               && ok "name-window"      || bad "name-window (global CLAUDE.md depends on it)"
+# name-window is no longer auto-invoked — Claude Code sets the title itself, so
+# long as CLAUDE_CODE_DISABLE_TERMINAL_TITLE stays unset. Kept only for manual
+# /name-window; its absence is not a failure.
+[ -e "$CLAUDE_DIR/skills/name-window" ]               && ok "name-window (manual)" || warn "name-window absent (optional)"
+grep -q CLAUDE_CODE_DISABLE_TERMINAL_TITLE "$CLAUDE_DIR/settings.json" \
+  && bad "CLAUDE_CODE_DISABLE_TERMINAL_TITLE set — Claude Code cannot name windows" \
+  || ok "terminal title not suppressed"
 DANGLING=$(find "$CLAUDE_DIR/skills" -maxdepth 1 -type l ! -exec test -e {} \; -print 2>/dev/null | wc -l | tr -d ' ')
 [ "$DANGLING" = "0" ] && ok "no dangling skill symlinks" || bad "$DANGLING dangling skill symlink(s)"
 
