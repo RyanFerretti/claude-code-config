@@ -130,10 +130,19 @@ To resume a session, use `codex exec resume <thread_id>`.
 6. Parse verdict: APPROVED | CHANGES_REQUESTED
 7. If CHANGES_REQUESTED:
    a. Evaluate each issue - do you agree?
-   b. If you agree: make the fixes, then resume Codex session with targeted re-review
+   b. If you agree: fix, then SWEEP every dependent statement (see 3b), then resume
+      Codex session with a BOUNDED verification (not a full re-review)
    c. If you disagree on any point: escalate to user
-8. If APPROVED: report success and exit
-9. If max iterations (5) reached: escalate to user
+8. Stop when a round returns ZERO blocking findings. NEVER stop on a round that still
+   reports blockers, regardless of iteration count. Round count is not a valid bound:
+   measured, the last round to find a real defect was the final round or the one before
+   it in EVERY chain observed — including chains that ran 7 and 8 rounds. Two chains
+   stopped while their reviewer still reported open blockers and needed further fix
+   commits afterwards.
+9. Circuit-breaker: if two consecutive rounds each surface residue from a prior fix,
+   STOP reviewing and do a full sweep (3b step 1) before the next round. You are paying
+   for a reviewer to find things you already know how to look for.
+10. If iteration 8 is reached without convergence: escalate to user.
 ```
 
 ## Step 1: Initial Codex Review
@@ -188,14 +197,26 @@ Only flag issues that would block a merge or cause real problems in production:
 - Race conditions, deadlocks, concurrency issues
 - Data integrity risks (lost writes, inconsistent state, missing transactions)
 - Incorrect integration with existing code (wrong types, missing required fields, misused APIs)
+- **A statement of fact that is FALSE** — in a comment, doc, runbook, register, task row
+  or external-facing summary. Classify by whether the statement is TRUE, not by which
+  file it lives in. A false claim about a control is a defect exactly as much as a wrong
+  branch in code, and an OVERCLAIM — a sentence asserting more than the evidence
+  supports — is false, not merely imprecise.
+- **A comment that contradicts the code it governs**, where the project treats comments
+  as contract.
 
 Do NOT flag:
 - Style or formatting preferences
 - Naming suggestions unless current names are actively misleading
-- Missing comments or documentation
+- Missing comments or documentation — but a comment or document that is present and
+  WRONG is a blocking defect, not a documentation gap. Do not let this line suppress it.
 - "Nice to have" refactoring
 - Hypothetical edge cases that are extremely unlikely
 - Test coverage gaps unless a critical path is completely untested
+
+Everything that does not meet the blocking bar goes under FOLLOW-UP and does not block.
+If a section is fine, say so — a clean verdict on a section is a useful result. Do not
+invent findings to justify the round.
 
 ## Response Format
 
@@ -209,6 +230,14 @@ LINE: [line number or range]
 PRIORITY: [P0 (critical) | P1 (high) | P2 (medium) | P3 (low)]
 DESCRIPTION: [what is wrong and why it matters]
 SUGGESTION: [specific code or approach to fix it]
+CLASS: [Does this pattern recur elsewhere? Name the class and every other site you know
+        of, or write "instance only". If you are asking for a claim to be narrowed, list
+        every place that claim is stated. The fixer sweeps what you name here — an
+        unnamed sibling becomes next round's finding.]
+
+Then, separately:
+FOLLOW-UP: [non-blocking — imprecision, emphasis, structure, pre-existing defects this
+            change did not touch]
 
 If APPROVED:
 SUMMARY: [1-2 sentence confirmation]
@@ -267,9 +296,37 @@ Read the relevant file and line. Determine if Codex's feedback is valid:
 - **You disagree**: The issue is a false positive, stylistic nitpick, or based on missing context
 
 ### 3b. If You Agree with ALL Issues
-1. Make the fixes using Edit/Write tools
+1. Fix each issue — then **SWEEP before re-submitting**. For every fix you just made:
+   a. Grep the whole repo for the claim or pattern you changed, in every phrasing
+      you can think of. Fix every dependent statement in THIS round.
+   b. If you NARROWED or qualified a claim, list what depended on its old strength
+      and fix that too. This is the single largest source of next-round findings.
+   c. If the defect was an instance of a pattern, fix every instance, not just the
+      reported site.
+   d. In the follow-up brief, state what you swept and what you deliberately left.
+
+   Skipping this step is what makes a review loop long. Measured across 147 findings
+   in 10 review chains: ~52% of all findings were created by the previous round's own
+   fix, and ~80% of findings in rounds 2+ were. Regression share tracks round count
+   (Spearman rho +0.64) — the chains that spent the most rounds are the ones whose
+   fixes kept spawning the next round's findings.
 2. Inform the user what you fixed and why
-3. Resume the Codex session for **targeted verification** (not a full re-review):
+3. Resume the Codex session for **targeted verification** (not a full re-review).
+
+**The follow-up brief is BOUNDED and stays bounded.** Do not write "re-audit from
+scratch", "re-review the whole change", or "look again more broadly". This is not a
+style preference — it is the most-violated instruction in this skill and it costs real
+time. Measured: a genuinely bounded pass cost 3.4 min against a 14.1 min chain mean and
+found four real defects that five full re-reviews had left behind, all of them residue
+from earlier partial fixes. If you believe a full re-review is needed, that is a signal
+you did not sweep (step 1 above) — go sweep instead.
+
+**One exception:** a PR that changes executable code needs ONE unbounded round returning
+zero blocking findings before you stop (see 3c). Docs-only PRs do not. Measured: a bounded
+pass safely terminated a records-only PR, but on code PRs the next unbounded review found
+several P0/P1 defects entirely outside the bounded pass's checked-item list — including one
+that reopened a data-integrity path the bounded pass believed it had closed. A bounded pass
+only ever verifies what you point it at.
 
 ```bash
 #!/bin/bash
@@ -322,7 +379,13 @@ Then go back to Step 2.
 
 ### 3c. Final Full Re-Review
 
-Once all individual issues are verified and approved, do one final full re-review pass to catch anything the fixes may have introduced:
+Once all individual issues are verified and approved, do one final full re-review pass to catch anything the fixes may have introduced.
+
+**Required for any PR that changes executable code. Skip it for docs/records-only PRs** —
+there, a bounded verification pass returning zero blocking findings is a safe terminator,
+and the full pass buys confirmation rather than discovery. This is the one place the
+unbounded round earns its cost, because it is the pass that catches fix-induced
+regressions the bounded pass was never pointed at.
 
 ```bash
 PROMPT_FILE="./tmp/{{RUN_ID}}-final.txt"
@@ -383,12 +446,18 @@ When Codex approves:
 
 ## Step 5: Max Iterations
 
-If you hit 5 iterations without approval:
+If you hit 8 iterations without approval:
+
+**Do not treat a high iteration count as a reason to stop.** A long chain is a symptom of
+incomplete fixes, not of a fussy reviewer. Before escalating, check whether the recent
+rounds are finding NEW defects or residue from your own earlier fixes — if it is residue,
+sweep (3b step 1) rather than escalating. Measured: chains running 7 and 8 rounds were
+still producing real defects in their second-to-last round.
 
 ```
 ## Review Loop: Max Iterations Reached
 
-After 5 review cycles, Codex is still requesting changes.
+After 8 review cycles, Codex is still requesting changes.
 
 **Latest outstanding issues:**
 [list remaining issues]
