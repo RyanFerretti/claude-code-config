@@ -294,10 +294,6 @@ say "Verify"
 [ -f "$CLAUDE_DIR/rules/tmux-dev-server.md" ]         && ok "rules/"           || bad "rules/"
 [ -f "$CLAUDE_DIR/agents/meta-agent.md" ]             && ok "agents/"          || bad "agents/"
 [ -f "$CLAUDE_DIR/status_lines/status_line_powerline.py" ] && ok "status line" || bad "status line"
-# name-window is no longer auto-invoked — Claude Code sets the title itself, so
-# long as CLAUDE_CODE_DISABLE_TERMINAL_TITLE stays unset. Kept only for manual
-# /name-window; its absence is not a failure.
-[ -e "$CLAUDE_DIR/skills/name-window" ]               && ok "name-window (manual)" || warn "name-window absent (optional)"
 grep -q CLAUDE_CODE_DISABLE_TERMINAL_TITLE "$CLAUDE_DIR/settings.json" \
   && bad "CLAUDE_CODE_DISABLE_TERMINAL_TITLE set — Claude Code cannot name windows" \
   || ok "terminal title not suppressed"
